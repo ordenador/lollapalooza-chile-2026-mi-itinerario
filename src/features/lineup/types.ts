@@ -36,6 +36,7 @@ export type ArtistListeningLinks = {
 
 export type ArtistPreview = {
   songs: [SongPreview, SongPreview, SongPreview];
+  artistImageUrl?: string | null;
   artistLinks: ArtistListeningLinks;
   styleDescription: string;
   verdict: string;

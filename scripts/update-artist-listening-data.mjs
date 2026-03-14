@@ -24,6 +24,14 @@ function quoteOrNull(value) {
   return value ? quote(value) : 'null';
 }
 
+function upscaleArtworkUrl(url, size = 600) {
+  if (!url) {
+    return null;
+  }
+
+  return String(url).replace(/\/\d+x\d+bb\./, `/${size}x${size}bb.`);
+}
+
 function buildSpotifySearchUrl(query) {
   return `https://open.spotify.com/search/${encodeURIComponent(query)}`;
 }
@@ -68,6 +76,17 @@ function readBaselineSongsFromGit() {
 
       if (Array.isArray(parsedSongs)) {
         songsByArtist[artistId] = parsedSongs
+          .map((song) => {
+            if (typeof song === 'string') {
+              return song;
+            }
+
+            if (song && typeof song.title === 'string') {
+              return song.title;
+            }
+
+            return null;
+          })
           .filter((song) => typeof song === 'string')
           .slice(0, 3);
       }
@@ -262,6 +281,25 @@ async function resolveArtistAppleMusicLink(artistName) {
   return bestResult?.artistLinkUrl ?? null;
 }
 
+async function resolveArtistImageUrl(artistName) {
+  const url = `https://itunes.apple.com/search?term=${encodeURIComponent(artistName)}&entity=song&country=CL&limit=30`;
+  const payload = await fetchJson(url);
+  const results = Array.isArray(payload?.results) ? payload.results : [];
+
+  const bestMatch = results
+    .map((result) => ({
+      result,
+      score: artistMatchScore(artistName, String(result?.artistName ?? '')),
+    }))
+    .filter(({ result, score }) => score >= 10 && result?.artworkUrl100)
+    .sort((a, b) => b.score - a.score)[0]?.result;
+
+  const fallbackMatch = results.find((result) => result?.artworkUrl100) ?? null;
+  const artworkUrl = bestMatch?.artworkUrl100 ?? fallbackMatch?.artworkUrl100 ?? null;
+
+  return upscaleArtworkUrl(artworkUrl, 600);
+}
+
 function buildStyleDescription(artistName, genre) {
   return `Set de ${genre.toLowerCase()} con energía en alza, coros fáciles y un clima ideal para ver en vivo a ${artistName}.`;
 }
@@ -275,7 +313,7 @@ function renderSong(song) {
 }
 
 function renderPreviewBlock(preview) {
-  return `  ${preview.id}: {\n    songs: [\n${preview.songs.map((song) => renderSong(song)).join(',\n')}\n    ],\n    artistLinks: {\n      appleMusic: ${quoteOrNull(preview.artistLinks.appleMusic)},\n      spotify: ${quote(preview.artistLinks.spotify)},\n      youtube: ${quote(preview.artistLinks.youtube)},\n    },\n    styleDescription: ${quote(preview.styleDescription)},\n    verdict: ${quote(preview.verdict)},\n  }`;
+  return `  ${preview.id}: {\n    songs: [\n${preview.songs.map((song) => renderSong(song)).join(',\n')}\n    ],\n    artistImageUrl: ${quoteOrNull(preview.artistImageUrl)},\n    artistLinks: {\n      appleMusic: ${quoteOrNull(preview.artistLinks.appleMusic)},\n      spotify: ${quote(preview.artistLinks.spotify)},\n      youtube: ${quote(preview.artistLinks.youtube)},\n    },\n    styleDescription: ${quote(preview.styleDescription)},\n    verdict: ${quote(preview.verdict)},\n  }`;
 }
 
 async function main() {
@@ -302,10 +340,12 @@ async function main() {
     ]);
 
     const artistAppleMusic = await resolveArtistAppleMusicLink(artist.name);
+    const artistImageUrl = await resolveArtistImageUrl(artist.name);
 
     previews.push({
       id: artist.id,
       songs,
+      artistImageUrl,
       artistLinks: {
         appleMusic: artistAppleMusic,
         spotify: buildSpotifySearchUrl(artist.name),
@@ -324,7 +364,7 @@ async function main() {
     .map((preview) => renderPreviewBlock(preview))
     .join(
       ',\n',
-    )}\n};\n\nexport const PREVIEW_FALLBACK: ArtistPreview = {\n  songs: [\n    {\n      title: 'Busca su set en Spotify',\n      previewUrl: null,\n      links: {\n        appleMusic: null,\n        spotify: 'https://open.spotify.com/search/musica%20en%20vivo',\n        youtube: 'https://www.youtube.com/results?search_query=musica+en+vivo',\n      },\n    },\n    {\n      title: 'Revisa su playlist oficial',\n      previewUrl: null,\n      links: {\n        appleMusic: null,\n        spotify: 'https://open.spotify.com/search/playlist%20oficial',\n        youtube: 'https://www.youtube.com/results?search_query=playlist+oficial',\n      },\n    },\n    {\n      title: 'Escucha una sesión en vivo',\n      previewUrl: null,\n      links: {\n        appleMusic: null,\n        spotify: 'https://open.spotify.com/search/live%20session',\n        youtube: 'https://www.youtube.com/results?search_query=live+session',\n      },\n    },\n  ],\n  artistLinks: {\n    appleMusic: null,\n    spotify: 'https://open.spotify.com/search',\n    youtube: 'https://www.youtube.com/results?search_query=musica',\n  },\n  styleDescription: 'No encontramos una previa específica para este artista en este momento.',\n  verdict: 'Igual puede sorprender en vivo; dale una escucha rápida antes del show.',\n};\n`;
+    )}\n};\n\nexport const PREVIEW_FALLBACK: ArtistPreview = {\n  songs: [\n    {\n      title: 'Busca su set en Spotify',\n      previewUrl: null,\n      links: {\n        appleMusic: null,\n        spotify: 'https://open.spotify.com/search/musica%20en%20vivo',\n        youtube: 'https://www.youtube.com/results?search_query=musica+en+vivo',\n      },\n    },\n    {\n      title: 'Revisa su playlist oficial',\n      previewUrl: null,\n      links: {\n        appleMusic: null,\n        spotify: 'https://open.spotify.com/search/playlist%20oficial',\n        youtube: 'https://www.youtube.com/results?search_query=playlist+oficial',\n      },\n    },\n    {\n      title: 'Escucha una sesión en vivo',\n      previewUrl: null,\n      links: {\n        appleMusic: null,\n        spotify: 'https://open.spotify.com/search/live%20session',\n        youtube: 'https://www.youtube.com/results?search_query=live+session',\n      },\n    },\n  ],\n  artistImageUrl: null,\n  artistLinks: {\n    appleMusic: null,\n    spotify: 'https://open.spotify.com/search',\n    youtube: 'https://www.youtube.com/results?search_query=musica',\n  },\n  styleDescription: 'No encontramos una previa específica para este artista en este momento.',\n  verdict: 'Igual puede sorprender en vivo; dale una escucha rápida antes del show.',\n};\n`;
 
   await writeFile(PREVIEWS_PATH, fileContent, 'utf8');
   console.log(`Wrote ${PREVIEWS_PATH}`);

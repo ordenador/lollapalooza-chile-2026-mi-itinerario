@@ -53,9 +53,13 @@ export function LineupHeader({
             <span className="hidden sm:inline">
               {view === 'mine' ? 'Ver Todo' : 'Mis Bandas'}
             </span>
-            {favoritesCount > 0 ? (
-              <span className="ml-1 bg-black/20 px-1.5 text-xs">{favoritesCount}</span>
-            ) : null}
+            <span
+              suppressHydrationWarning
+              aria-hidden={favoritesCount === 0}
+              className="ml-1 min-w-[1.5rem] bg-black/20 px-1.5 text-center text-xs"
+            >
+              {favoritesCount > 0 ? favoritesCount : ''}
+            </span>
           </button>
         </div>
       </div>
