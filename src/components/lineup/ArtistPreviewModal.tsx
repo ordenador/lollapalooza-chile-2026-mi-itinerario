@@ -188,11 +188,11 @@ export function ArtistPreviewModal({
             </div>
           </div>
 
-          <p className="mt-4 text-xs text-zinc-400">
-            {playableSongs.length > 0
-              ? 'Si inicias otra canción, la anterior se pausa automáticamente.'
-              : 'No encontramos preview de 30 segundos para este artista.'}
-          </p>
+          {playableSongs.length === 0 ? (
+            <p className="mt-4 text-xs text-zinc-400">
+              No encontramos preview de 30 segundos para este artista.
+            </p>
+          ) : null}
         </header>
 
         <div
