@@ -20,9 +20,6 @@ export const metadata: Metadata = {
   title: 'Lollapalooza Chile 2026 - Mi Itinerario',
   description: 'Organiza tu ruta del festival y guarda tus bandas favoritas.',
   manifest: '/manifest.json',
-  icons: {
-    icon: '/favicon.ico',
-  },
 };
 
 export default function RootLayout({
