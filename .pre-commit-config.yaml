@@ -1,0 +1,57 @@
+fail_fast: true
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        name: trailing-whitespace (markdown only)
+        files: '\.(md|MD)$'
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  - repo: local
+    hooks:
+      - id: prettier-format
+        name: Format code (Prettier)
+        entry: corepack pnpm run format
+        language: system
+        files: '\.(ts|tsx|js|jsx|json|css|md|yml|yaml)$'
+        pass_filenames: false
+
+      - id: eslint-lint
+        name: Run ESLint
+        entry: corepack pnpm run lint
+        language: system
+        files: '\.(ts|tsx|js|jsx)$'
+        pass_filenames: false
+
+      - id: typescript-check
+        name: TypeScript type check
+        entry: corepack pnpm run type-check
+        language: system
+        files: '\.(ts|tsx)$'
+        pass_filenames: false
+        always_run: true
+
+      - id: vitest-run
+        name: Run tests
+        entry: corepack pnpm run test
+        language: system
+        files: '\.(ts|tsx)$'
+        pass_filenames: false
+
+      - id: next-build
+        name: Build application
+        entry: corepack pnpm run build
+        language: system
+        files: '\.(ts|tsx|js|jsx|json|css)$'
+        pass_filenames: false
+
+default_stages: [pre-commit]
