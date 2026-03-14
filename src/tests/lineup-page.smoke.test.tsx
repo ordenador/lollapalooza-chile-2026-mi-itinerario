@@ -11,7 +11,7 @@ describe('Lineup page smoke', () => {
     const djoCard = screen.getByTestId('artist-card-3');
     fireEvent.click(djoCard);
 
-    expect(screen.getByText(/El Vibe del Show/i)).toBeInTheDocument();
+    expect(screen.getByText(/Vibe en vivo/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /Cerrar preview/i }));
 

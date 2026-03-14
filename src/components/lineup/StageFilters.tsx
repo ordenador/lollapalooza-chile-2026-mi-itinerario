@@ -12,16 +12,16 @@ export function StageFilters({
   onSelectStage,
 }: StageFiltersProps) {
   return (
-    <div className="no-scrollbar mx-auto max-w-4xl overflow-x-auto px-4 pb-1">
+    <div className="no-scrollbar border-subtle mx-auto max-w-4xl overflow-x-auto border-b px-4 pb-2">
       <div className="flex gap-2">
         {stages.map((stage) => (
           <button
             key={stage}
             onClick={() => onSelectStage(stage)}
-            className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+            className={`font-display whitespace-nowrap border px-3 py-1.5 text-xs transition-colors ${
               selectedStage === stage
-                ? 'bg-white text-black'
-                : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                ? 'button-lime border-lime-300'
+                : 'surface-muted border-subtle text-zinc-200 hover:bg-zinc-800'
             }`}
           >
             {stage}

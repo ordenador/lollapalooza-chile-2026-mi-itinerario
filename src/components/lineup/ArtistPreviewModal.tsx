@@ -21,63 +21,61 @@ export function ArtistPreviewModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/80 p-4 backdrop-blur-sm sm:items-center">
-      <div className="modal-enter w-full max-w-md overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900 shadow-2xl">
+    <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/80 p-4 sm:items-center">
+      <div className="modal-enter surface-main border-subtle w-full max-w-md overflow-hidden border shadow-2xl">
         <div className="relative p-6">
           <button
             onClick={onClose}
-            className="absolute right-4 top-4 rounded-full bg-zinc-800 p-2 text-zinc-400 hover:text-white"
+            className="surface-muted border-subtle text-muted absolute right-4 top-4 border p-2 hover:text-white"
             aria-label="Cerrar preview"
           >
             <X className="h-5 w-5" />
           </button>
 
           <div className="mb-4 flex items-center gap-3">
-            <div className="rounded-2xl bg-cyan-500/10 p-3">
-              <Music className="h-6 w-6 text-cyan-400" />
+            <div className="border border-cyan-400/40 bg-cyan-400/10 p-3">
+              <Music className="h-5 w-5 text-cyan-300" />
             </div>
             <div>
-              <h2 className="text-2xl font-black uppercase italic leading-none">
+              <h2 className="font-display text-2xl leading-none text-white">
                 {artist.name}
               </h2>
-              <p className="mt-1 text-xs font-bold uppercase tracking-widest text-zinc-500">
-                {artist.stage}
-              </p>
+              <p className="text-muted mt-1 text-xs">{artist.stage}</p>
             </div>
           </div>
 
           <div className="space-y-6">
             <div>
-              <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400">
+              <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-cyan-300">
                 <Play className="h-3 w-3 fill-current" />
-                <span>Escucha esto para conocerlos</span>
+                <span>Canciones recomendadas</span>
               </div>
 
               <div className="space-y-2">
                 {preview.songs.map((song, index) => (
                   <div
                     key={`${song}-${index}`}
-                    className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-800/50 p-3 transition-colors hover:bg-zinc-800"
+                    className="surface-muted border-subtle flex items-center gap-3 border p-3 transition-colors hover:bg-zinc-800"
                   >
-                    <span className="font-black italic text-cyan-500">{index + 1}</span>
-                    <span className="text-sm font-bold text-zinc-200">{song}</span>
+                    <span className="font-display text-cyan-400">{index + 1}</span>
+                    <span className="text-sm text-zinc-100">{song}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/5 p-4">
-              <div className="mb-2 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400">
+            <div className="border border-cyan-400/30 bg-cyan-400/10 p-4">
+              <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-cyan-300">
                 <Sparkles className="h-3 w-3" />
-                <span>El Vibe del Show</span>
+                <span>Vibe en vivo</span>
               </div>
 
-              <p className="mb-3 text-sm leading-relaxed text-zinc-300">
+              <p className="mb-3 text-sm leading-relaxed text-zinc-100">
                 {preview.styleDescription}
               </p>
 
-              <div className="border-t border-cyan-500/10 pt-3">
-                <p className="text-xs italic text-cyan-400/80">
+              <div className="border-t border-cyan-300/20 pt-3">
+                <p className="text-xs text-cyan-100/90">
                   <strong>Veredicto:</strong> {preview.verdict}
                 </p>
               </div>
@@ -88,13 +86,13 @@ export function ArtistPreviewModal({
                 onToggleFavorite(artist.id);
                 onClose();
               }}
-              className={`w-full rounded-2xl py-4 font-black uppercase tracking-widest transition-all ${
+              className={`w-full border px-4 py-3 text-sm font-semibold transition-colors ${
                 isFavorite
-                  ? 'bg-zinc-800 text-zinc-400'
-                  : 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 hover:bg-cyan-400'
+                  ? 'surface-muted border-subtle text-zinc-300'
+                  : 'button-cyan border-cyan-400 hover:bg-cyan-300'
               }`}
             >
-              {isFavorite ? 'Eliminar de mi Itinerario' : '¡Lo quiero ver!'}
+              {isFavorite ? 'Eliminar de mi itinerario' : 'Agregar a mi itinerario'}
             </button>
           </div>
         </div>

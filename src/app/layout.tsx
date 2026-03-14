@@ -1,11 +1,19 @@
 import type { Metadata } from 'next';
-import { Space_Grotesk } from 'next/font/google';
+import { Anton, Golos_Text } from 'next/font/google';
 import '@/styles/globals.css';
 
-const spaceGrotesk = Space_Grotesk({
+const golosText = Golos_Text({
   subsets: ['latin'],
   weight: ['400', '500', '700'],
   display: 'swap',
+  variable: '--font-body',
+});
+
+const anton = Anton({
+  subsets: ['latin'],
+  weight: ['400'],
+  display: 'swap',
+  variable: '--font-display',
 });
 
 export const metadata: Metadata = {
@@ -24,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className="dark">
-      <body className={spaceGrotesk.className}>{children}</body>
+      <body className={`${golosText.variable} ${anton.variable}`}>{children}</body>
     </html>
   );
 }

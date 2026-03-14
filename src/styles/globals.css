@@ -4,6 +4,17 @@
 
 :root {
   color-scheme: dark;
+  --lolla-bg: #000;
+  --lolla-surface: #1d1d1d;
+  --lolla-surface-2: #131313;
+  --lolla-surface-3: #242424;
+  --lolla-line: #2f2f2f;
+  --lolla-text: #fff;
+  --lolla-text-muted: #9ca3af;
+  --lolla-ink: #1d1d1b;
+  --lolla-cyan: #00c3e3;
+  --lolla-lime: #d5dd17;
+  --lolla-pink: #e9bad4;
 }
 
 * {
@@ -13,8 +24,14 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #09090b;
-  color: #fff;
+  background-color: var(--lolla-bg);
+  color: var(--lolla-text);
+  font-family: var(--font-body), sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), sans-serif;
+  letter-spacing: 0.02em;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -29,7 +46,7 @@ body {
 @keyframes modal-slide-up {
   from {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(8px);
   }
 
   to {
@@ -39,5 +56,40 @@ body {
 }
 
 .modal-enter {
-  animation: modal-slide-up 220ms ease-out;
+  animation: modal-slide-up 140ms ease-out;
+}
+
+.surface-main {
+  background-color: var(--lolla-surface);
+}
+
+.surface-muted {
+  background-color: var(--lolla-surface-2);
+}
+
+.surface-raised {
+  background-color: var(--lolla-surface-3);
+}
+
+.text-muted {
+  color: var(--lolla-text-muted);
+}
+
+.border-subtle {
+  border-color: var(--lolla-line);
+}
+
+.button-cyan {
+  background-color: var(--lolla-cyan);
+  color: var(--lolla-ink);
+}
+
+.button-lime {
+  background-color: var(--lolla-lime);
+  color: var(--lolla-ink);
+}
+
+.button-pink {
+  background-color: var(--lolla-pink);
+  color: var(--lolla-ink);
 }

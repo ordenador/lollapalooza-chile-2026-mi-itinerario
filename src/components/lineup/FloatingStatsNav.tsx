@@ -14,32 +14,28 @@ export function FloatingStatsNav({
   onToggleView,
 }: FloatingStatsNavProps) {
   return (
-    <footer className="pointer-events-none fixed bottom-0 left-0 right-0 p-4">
-      <div className="pointer-events-auto mx-auto flex max-w-md items-center justify-between rounded-3xl border border-zinc-800 bg-zinc-900/90 p-3 px-6 shadow-2xl backdrop-blur-xl">
+    <footer className="fixed bottom-0 left-0 right-0 px-4 py-3">
+      <div className="surface-main border-subtle mx-auto flex max-w-4xl items-center justify-between gap-4 border px-5 py-3">
         <div className="flex flex-col items-center">
-          <span className="text-[8px] font-bold uppercase tracking-tighter text-zinc-500">
-            Eventos
-          </span>
-          <span className="text-sm font-black italic text-white">{totalEvents}</span>
+          <span className="font-display text-[10px] text-zinc-400">EVENTOS</span>
+          <span className="font-display text-base text-white">{totalEvents}</span>
         </div>
 
         <div className="h-8 w-px bg-zinc-800" />
 
         <div className="flex flex-col items-center">
-          <span className="text-[8px] font-bold uppercase tracking-tighter text-zinc-500">
-            Mi Itinerario
-          </span>
-          <span className="text-sm font-black italic text-cyan-400">
-            {favoritesCount}
-          </span>
+          <span className="font-display text-[10px] text-zinc-400">MI RUTA</span>
+          <span className="font-display text-base text-cyan-400">{favoritesCount}</span>
         </div>
 
         <div className="h-8 w-px bg-zinc-800" />
 
         <button
           onClick={onToggleView}
-          className={`rounded-2xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all ${
-            view === 'mine' ? 'bg-white text-black' : 'bg-cyan-500 text-black'
+          className={`font-display border px-4 py-2 text-xs transition-colors ${
+            view === 'mine'
+              ? 'button-pink border-pink-300'
+              : 'button-cyan border-cyan-400'
           }`}
         >
           {view === 'mine' ? 'Lineup' : 'Mi Ruta'}

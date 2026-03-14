@@ -45,7 +45,7 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 pb-24 text-white">
+    <div className="min-h-screen bg-black pb-28 text-zinc-100">
       <LineupHeader
         searchTerm={searchTerm}
         onSearchTermChange={setSearchTerm}
@@ -63,7 +63,7 @@ export default function Page() {
       ) : null}
 
       <main className="mx-auto max-w-4xl p-4">
-        <div className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-500">
+        <div className="mb-4 flex items-center gap-2 text-xs text-zinc-400">
           <Info className="h-3 w-3" />
           <span>Toca una banda para ver su preview</span>
         </div>
