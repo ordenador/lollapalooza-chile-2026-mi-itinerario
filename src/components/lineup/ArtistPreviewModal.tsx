@@ -1,5 +1,5 @@
 import { ArrowLeft, ExternalLink, Music, Pause, Play, Sparkles, X } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import type { Artist, ArtistPreview } from '@/features/lineup/types';
 
@@ -10,6 +10,33 @@ type ArtistPreviewModalProps = {
   onClose: () => void;
   onToggleFavorite: (artistId: number) => void;
 };
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function highlightStyleInText(text: string, style: string): ReactNode {
+  if (!style.trim()) {
+    return text;
+  }
+
+  const pattern = new RegExp(`(${escapeRegExp(style)})`, 'gi');
+  const parts = text.split(pattern);
+
+  if (parts.length <= 1) {
+    return text;
+  }
+
+  return parts.map((part, index) =>
+    part.toLowerCase() === style.toLowerCase() ? (
+      <strong key={`style-${index}`} className="font-semibold text-zinc-50">
+        {part}
+      </strong>
+    ) : (
+      <span key={`text-${index}`}>{part}</span>
+    ),
+  );
+}
 
 export function ArtistPreviewModal({
   artist,
@@ -81,6 +108,12 @@ export function ArtistPreviewModal({
   if (!artist || !preview) {
     return null;
   }
+
+  const highlightedStyleDescription = highlightStyleInText(
+    preview.styleDescription,
+    artist.genre,
+  );
+  const highlightedVerdict = highlightStyleInText(preview.verdict, artist.genre);
 
   return (
     <div
@@ -344,12 +377,12 @@ export function ArtistPreviewModal({
             </div>
 
             <p className="mb-3 text-sm leading-relaxed text-zinc-100">
-              {preview.styleDescription}
+              {highlightedStyleDescription}
             </p>
 
             <div className="border-t border-cyan-300/20 pt-3">
               <p className="text-xs text-cyan-100/90">
-                <strong>Veredicto:</strong> {preview.verdict}
+                <strong>Veredicto:</strong> {highlightedVerdict}
               </p>
             </div>
           </section>

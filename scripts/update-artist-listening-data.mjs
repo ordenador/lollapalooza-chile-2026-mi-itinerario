@@ -5,6 +5,24 @@ import vm from 'node:vm';
 
 const ARTISTS_PATH = path.resolve('src/features/lineup/data/artists.ts');
 const PREVIEWS_PATH = path.resolve('src/features/lineup/data/artist-previews.ts');
+const REQUEST_HEADERS = {
+  'User-Agent': 'lolla-itinerario/1.0 (+https://github.com/mfaundez/ordenador)',
+  Accept: 'application/json',
+};
+const MUSIC_CONTEXT_PATTERN =
+  /\b(banda|grupo|cantante|musico|músico|rapero|rapper|dj|productor|duo|dúo|solista|compositor|music|musician|singer|artist|hip hop|rock|pop|electro|house|techno|folk|jazz|serie|television|televisión|programa)\b/i;
+const COUNTRY_BY_ISO = {
+  AR: 'Argentina',
+  AU: 'Australia',
+  CL: 'Chile',
+  CU: 'Cuba',
+  ES: 'España',
+  KR: 'Corea del Sur',
+  MX: 'México',
+  NZ: 'Nueva Zelanda',
+  UK: 'Reino Unido',
+  US: 'Estados Unidos',
+};
 
 function normalizeText(value) {
   return value
@@ -200,7 +218,7 @@ function pickBestArtistResult(results, artistName) {
 
 async function fetchJson(url) {
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, { headers: REQUEST_HEADERS });
     if (!response.ok) {
       return null;
     }
@@ -243,6 +261,222 @@ function isMeaningfulTitle(songTitle) {
 
 function uniqueStrings(values) {
   return [...new Set(values.filter(Boolean))];
+}
+
+function compactText(value) {
+  return String(value ?? '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\[[^\]]+\]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function trimSentence(value, maxLength = 220) {
+  const text = compactText(value);
+  if (text.length <= maxLength) {
+    return text;
+  }
+
+  const clipped = text.slice(0, maxLength);
+  const lastSpace = clipped.lastIndexOf(' ');
+  return `${clipped.slice(0, lastSpace > 0 ? lastSpace : maxLength).trim()}…`;
+}
+
+function includesMusicContext(value) {
+  return MUSIC_CONTEXT_PATTERN.test(String(value ?? ''));
+}
+
+function isSingleTokenArtistName(artistName) {
+  return normalizeText(artistName).split(' ').filter(Boolean).length === 1;
+}
+
+function scoreWikipediaSearchResult(artistName, result) {
+  const title = String(result?.title ?? '');
+  const snippet = compactText(result?.snippet ?? '');
+  let score = artistMatchScore(artistName, title);
+
+  if (includesMusicContext(snippet)) {
+    score += 14;
+  }
+
+  if (title.includes('(') && title.includes(')')) {
+    score += 5;
+  }
+
+  if (/desambiguaci[oó]n|disambiguation/i.test(snippet)) {
+    score -= 30;
+  }
+
+  return score;
+}
+
+function buildWikipediaSummaryText(artistName, pageSummary) {
+  const title = compactText(pageSummary?.title ?? artistName);
+  const description = compactText(pageSummary?.description ?? '');
+  const extract = compactText(pageSummary?.extract ?? '');
+  const firstExtractSentence = extract.split(/(?<=[.!?])\s+/)[0] ?? '';
+
+  if (description) {
+    if (
+      normalizeText(description).startsWith(normalizeText(title)) ||
+      /^es\b/i.test(description)
+    ) {
+      return trimSentence(description);
+    }
+    return trimSentence(`${title} es ${description}.`);
+  }
+
+  if (firstExtractSentence) {
+    return trimSentence(firstExtractSentence);
+  }
+
+  return trimSentence(`${artistName} tiene presencia activa en plataformas musicales.`);
+}
+
+async function resolveWikipediaProfileByLanguage(artistName, language) {
+  const searchUrl = `https://${language}.wikipedia.org/w/api.php?action=query&list=search&srlimit=8&format=json&utf8=1&srsearch=${encodeURIComponent(
+    `${artistName} música`,
+  )}`;
+  const payload = await fetchJson(searchUrl);
+  const results = Array.isArray(payload?.query?.search) ? payload.query.search : [];
+  const candidates = results
+    .map((result) => ({
+      result,
+      score: scoreWikipediaSearchResult(artistName, result),
+    }))
+    .filter(({ score }) => score >= 18)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4);
+
+  for (const candidate of candidates) {
+    const title = String(candidate.result?.title ?? '').trim();
+    if (!title) {
+      continue;
+    }
+
+    const summaryUrl = `https://${language}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(
+      title,
+    )}`;
+    const summaryPayload = await fetchJson(summaryUrl);
+
+    if (!summaryPayload || summaryPayload?.type === 'disambiguation') {
+      continue;
+    }
+
+    const summaryTitle = compactText(summaryPayload.title ?? title);
+    const fullText = `${compactText(summaryPayload.description ?? '')} ${compactText(
+      summaryPayload.extract ?? '',
+    )}`.trim();
+    const titleScore = artistMatchScore(artistName, summaryTitle);
+    const hasMusicContext = includesMusicContext(fullText);
+    const singleTokenName = isSingleTokenArtistName(artistName);
+
+    if (titleScore < (singleTokenName ? 40 : 24)) {
+      continue;
+    }
+
+    if (!hasMusicContext && singleTokenName) {
+      continue;
+    }
+
+    return {
+      source: language === 'es' ? 'Wikipedia ES' : 'Wikipedia EN',
+      sourceUrl:
+        summaryPayload?.content_urls?.desktop?.page ??
+        `https://${language}.wikipedia.org/wiki/${encodeURIComponent(summaryTitle)}`,
+      summary: buildWikipediaSummaryText(artistName, summaryPayload),
+    };
+  }
+
+  return null;
+}
+
+function normalizeMusicBrainzType(type) {
+  const normalized = normalizeText(type);
+  if (normalized === 'group') {
+    return 'banda';
+  }
+  if (normalized === 'person') {
+    return 'artista solista';
+  }
+  if (normalized === 'duo') {
+    return 'dúo';
+  }
+  return null;
+}
+
+function normalizeCountryCode(countryCode) {
+  const normalizedCode = compactText(countryCode).toUpperCase();
+  return COUNTRY_BY_ISO[normalizedCode] ?? normalizedCode;
+}
+
+function buildMusicBrainzSummary(artistName, artist) {
+  const type = normalizeMusicBrainzType(artist?.type);
+  const country = normalizeCountryCode(artist?.country ?? '');
+  const tags = Array.isArray(artist?.tags)
+    ? artist.tags
+        .filter((tag) => typeof tag?.name === 'string' && Number(tag?.count ?? 0) > 0)
+        .sort((a, b) => Number(b.count) - Number(a.count))
+        .slice(0, 2)
+        .map((tag) => String(tag.name))
+    : [];
+
+  const parts = [];
+  if (type) {
+    parts.push(type);
+  }
+  if (country) {
+    parts.push(`asociado a ${country}`);
+  }
+  if (tags.length > 0) {
+    parts.push(`con etiquetas ${tags.join(' / ')}`);
+  }
+
+  if (parts.length === 0) {
+    return trimSentence(`${artistName} aparece registrado como artista musical en MusicBrainz.`);
+  }
+
+  return trimSentence(`${artistName} aparece en MusicBrainz como ${parts.join(', ')}.`);
+}
+
+async function resolveMusicBrainzProfile(artistName) {
+  const query = encodeURIComponent(`artist:${artistName}`);
+  const url = `https://musicbrainz.org/ws/2/artist/?query=${query}&fmt=json&limit=6`;
+  const payload = await fetchJson(url);
+  const results = Array.isArray(payload?.artists) ? payload.artists : [];
+  const ranked = results
+    .map((artist) => ({
+      artist,
+      apiScore: Number(artist?.score ?? 0),
+      nameScore: artistMatchScore(artistName, String(artist?.name ?? '')),
+    }))
+    .filter(({ apiScore, nameScore }) => apiScore >= 70 && nameScore >= 24)
+    .sort((a, b) => b.apiScore + b.nameScore - (a.apiScore + a.nameScore));
+  const best = ranked[0]?.artist;
+
+  if (!best) {
+    return null;
+  }
+
+  return {
+    source: 'MusicBrainz',
+    sourceUrl: best?.id ? `https://musicbrainz.org/artist/${best.id}` : null,
+    summary: buildMusicBrainzSummary(artistName, best),
+  };
+}
+
+async function resolveArtistProfile(artistName) {
+  const spanishWikiProfile = await resolveWikipediaProfileByLanguage(artistName, 'es');
+  if (spanishWikiProfile) {
+    return spanishWikiProfile;
+  }
+
+  const englishWikiProfile = await resolveWikipediaProfileByLanguage(artistName, 'en');
+  if (englishWikiProfile) {
+    return englishWikiProfile;
+  }
+
+  return await resolveMusicBrainzProfile(artistName);
 }
 
 function buildDeezerArtistQueries(artistName) {
@@ -505,11 +739,41 @@ async function resolveArtistImageUrlFromDeezer(artistName) {
 }
 
 function buildStyleDescription(artistName, genre) {
-  return `Set de ${genre.toLowerCase()} con energía en alza, coros fáciles y un clima ideal para ver en vivo a ${artistName}.`;
+  return `${artistName} aparece en el lineup en la línea ${genre.toLowerCase()}. Fuente: lineup oficial.`;
 }
 
-function buildVerdict(genre) {
-  return `Si conectas con ${genre.toLowerCase()}, este show es una parada fuerte de la jornada.`;
+function buildStyleDescriptionFromProfile(artistName, genre, profile) {
+  if (!profile?.summary) {
+    return buildStyleDescription(artistName, genre);
+  }
+
+  const profileSummary = trimSentence(profile.summary, 190);
+  if (normalizeText(profileSummary).includes(normalizeText(artistName))) {
+    return trimSentence(
+      `${profileSummary} Para esta guía, lo ubicamos en ${genre.toLowerCase()}. Fuente: ${profile.source}.`,
+      240,
+    );
+  }
+
+  return trimSentence(
+    `${artistName}: ${profileSummary} Para esta guía, lo ubicamos en ${genre.toLowerCase()}. Fuente: ${profile.source}.`,
+    240,
+  );
+}
+
+function buildVerdict(artistName, genre, profile) {
+  const genreLabel = genre.toLowerCase();
+  if (profile?.summary) {
+    return trimSentence(
+      `Si te interesa ${genreLabel} y te calza el perfil real de ${artistName}, este show es una buena opción para priorizar en la jornada.`,
+      220,
+    );
+  }
+
+  return trimSentence(
+    `Si te interesa ${genreLabel}, vale una escucha rápida previa para decidir si priorizar este show.`,
+    200,
+  );
 }
 
 function renderSong(song) {
@@ -543,9 +807,17 @@ async function main() {
       resolveSong(artist.name, songTitles[1]),
       resolveSong(artist.name, songTitles[2]),
     ]);
-
-    const artistAppleMusic = await resolveArtistAppleMusicLink(artist.name);
-    const artistImageUrl = await resolveArtistImageUrl(artist.name);
+    const [artistAppleMusic, artistImageUrl, artistProfile] = await Promise.all([
+      resolveArtistAppleMusicLink(artist.name),
+      resolveArtistImageUrl(artist.name),
+      resolveArtistProfile(artist.name),
+    ]);
+    const styleDescription = buildStyleDescriptionFromProfile(
+      artist.name,
+      artist.genre,
+      artistProfile,
+    );
+    const verdict = buildVerdict(artist.name, artist.genre, artistProfile);
 
     previews.push({
       id: artist.id,
@@ -556,11 +828,13 @@ async function main() {
         spotify: buildSpotifySearchUrl(artist.name),
         youtube: buildYoutubeSearchUrl(artist.name),
       },
-      styleDescription: buildStyleDescription(artist.name, artist.genre),
-      verdict: buildVerdict(artist.genre),
+      styleDescription,
+      verdict,
     });
 
-    console.log(`Updated artist ${artist.id}/33: ${artist.name}`);
+    console.log(
+      `Updated artist ${artist.id}/33: ${artist.name} (${artistProfile?.source ?? 'lineup'})`,
+    );
   }
 
   const generatedAt = new Date().toISOString();
