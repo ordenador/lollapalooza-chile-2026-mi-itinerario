@@ -1,4 +1,4 @@
-import { ExternalLink, Music, Pause, Play, Sparkles, X } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Music, Pause, Play, Sparkles, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import type { Artist, ArtistPreview } from '@/features/lineup/types';
@@ -20,6 +20,7 @@ export function ArtistPreviewModal({
 }: ArtistPreviewModalProps) {
   const audioContainerRef = useRef<HTMLDivElement | null>(null);
   const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
+  const touchStartYRef = useRef<number | null>(null);
   const [playingSongId, setPlayingSongId] = useState<string | null>(null);
   const artistImageUrl = preview?.artistImageUrl ?? null;
   const playableSongs =
@@ -93,7 +94,27 @@ export function ArtistPreviewModal({
       aria-modal="true"
       aria-labelledby={`artist-preview-title-${artist.id}`}
     >
-      <div className="modal-enter surface-main border-subtle relative flex max-h-[calc(100vh-1.5rem)] w-full max-w-lg flex-col overflow-hidden border shadow-2xl">
+      <div
+        className="modal-enter surface-main border-subtle relative flex max-h-[calc(100vh-1.5rem)] w-full max-w-lg flex-col overflow-hidden border shadow-2xl"
+        onTouchStart={(event) => {
+          touchStartYRef.current = event.touches[0]?.clientY ?? null;
+        }}
+        onTouchEnd={(event) => {
+          const startY = touchStartYRef.current;
+          const endY = event.changedTouches[0]?.clientY ?? null;
+          touchStartYRef.current = null;
+
+          if (startY === null || endY === null) {
+            return;
+          }
+
+          const touchDeltaY = endY - startY;
+          const isAtTop = (audioContainerRef.current?.scrollTop ?? 0) <= 4;
+          if (touchDeltaY > 80 && isAtTop) {
+            onClose();
+          }
+        }}
+      >
         {artistImageUrl ? (
           <>
             <div
@@ -114,6 +135,20 @@ export function ArtistPreviewModal({
             />
           </>
         ) : null}
+
+        <div className="relative z-10 border-b border-zinc-800 px-5 pb-2 pt-3 sm:hidden">
+          <div className="mb-2 flex justify-center" aria-hidden="true">
+            <span className="h-1 w-12 rounded-full bg-zinc-700" />
+          </div>
+          <button
+            onClick={onClose}
+            className="inline-flex min-h-9 items-center gap-1 border border-zinc-700 px-2.5 text-xs font-semibold text-zinc-200 transition-colors hover:border-cyan-400 hover:text-cyan-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60"
+            aria-label="Volver al listado"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>Volver</span>
+          </button>
+        </div>
 
         <header className="relative z-10 border-b border-zinc-800 px-5 pb-4 pt-5 sm:px-6 sm:pt-6">
           <button
