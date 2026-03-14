@@ -42,7 +42,7 @@ Comandos completos: revisar [Makefile](/Users/mfaundez/git/github/ordenador/loll
 
 ## CI
 
-El workflow [ci.yml](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/.github/workflows/ci.yml) ejecuta checks de calidad en `push` a `main` y `pull_request`. Las reglas se centralizan en `.pre-commit-config.yaml` para mantener paridad local/CI.
+El workflow [ci.yml](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/.github/workflows/ci.yml) ejecuta `make check` en `push` a `main` y `pull_request`. `pre-commit` se mantiene para feedback local antes de commitear.
 
 ## Estructura del proyecto
 
