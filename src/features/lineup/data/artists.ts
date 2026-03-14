@@ -1,5 +1,8 @@
 import type { Artist, Stage } from '@/features/lineup/types';
 
+export const LINEUP_DATE = '2026-03-14';
+export const LINEUP_TIME_ZONE = 'America/Santiago';
+
 export const STAGES: readonly Stage[] = [
   'Todos',
   'Cenco Malls Stage',
