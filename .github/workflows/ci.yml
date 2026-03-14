@@ -1,4 +1,4 @@
-name: pre-commit
+name: CI
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   checks:
-    name: pre-commit checks
+    name: Quality checks
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10.17.0
@@ -36,7 +36,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Run pre-commit (all files)
+      - name: Run quality checks
         uses: pre-commit/action@v3.0.1
         with:
           extra_args: --all-files --show-diff-on-failure
