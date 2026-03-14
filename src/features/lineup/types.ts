@@ -16,8 +16,27 @@ export type Artist = {
   genre: string;
 };
 
+export type SongListeningLinks = {
+  appleMusic: string | null;
+  spotify: string;
+  youtube: string;
+};
+
+export type SongPreview = {
+  title: string;
+  previewUrl: string | null;
+  links: SongListeningLinks;
+};
+
+export type ArtistListeningLinks = {
+  appleMusic: string | null;
+  spotify: string;
+  youtube: string;
+};
+
 export type ArtistPreview = {
-  songs: [string, string, string];
+  songs: [SongPreview, SongPreview, SongPreview];
+  artistLinks: ArtistListeningLinks;
   styleDescription: string;
   verdict: string;
 };

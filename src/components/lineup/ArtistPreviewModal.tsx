@@ -54,13 +54,91 @@ export function ArtistPreviewModal({
               <div className="space-y-2">
                 {preview.songs.map((song, index) => (
                   <div
-                    key={`${song}-${index}`}
-                    className="surface-muted border-subtle flex items-center gap-3 border p-3 transition-colors hover:bg-zinc-800"
+                    key={`${song.title}-${index}`}
+                    className="surface-muted border-subtle border p-3 transition-colors hover:bg-zinc-800"
                   >
-                    <span className="font-display text-cyan-400">{index + 1}</span>
-                    <span className="text-sm text-zinc-100">{song}</span>
+                    <div className="mb-2 flex items-center gap-3">
+                      <span className="font-display text-cyan-400">{index + 1}</span>
+                      <span className="text-sm text-zinc-100">{song.title}</span>
+                    </div>
+
+                    {song.previewUrl ? (
+                      <audio
+                        controls
+                        preload="none"
+                        className="mb-2 w-full"
+                        src={song.previewUrl}
+                      >
+                        Tu navegador no soporta audio HTML5.
+                      </audio>
+                    ) : (
+                      <p className="mb-2 text-xs text-zinc-400">
+                        Sin preview de 30 segundos disponible para esta canción.
+                      </p>
+                    )}
+
+                    <div className="flex flex-wrap gap-2 text-xs">
+                      <a
+                        href={song.links.youtube}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="border border-zinc-700 px-2 py-1 text-zinc-200 hover:border-cyan-400 hover:text-cyan-300"
+                      >
+                        YouTube
+                      </a>
+                      <a
+                        href={song.links.spotify}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="border border-zinc-700 px-2 py-1 text-zinc-200 hover:border-cyan-400 hover:text-cyan-300"
+                      >
+                        Spotify
+                      </a>
+                      {song.links.appleMusic ? (
+                        <a
+                          href={song.links.appleMusic}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="border border-zinc-700 px-2 py-1 text-zinc-200 hover:border-cyan-400 hover:text-cyan-300"
+                        >
+                          Apple Music
+                        </a>
+                      ) : null}
+                    </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            <div className="surface-muted border-subtle border p-3">
+              <p className="mb-2 text-xs font-semibold text-cyan-300">Escuchar artista</p>
+              <div className="flex flex-wrap gap-2 text-xs">
+                <a
+                  href={preview.artistLinks.youtube}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="border border-zinc-700 px-2 py-1 text-zinc-200 hover:border-cyan-400 hover:text-cyan-300"
+                >
+                  YouTube artista
+                </a>
+                <a
+                  href={preview.artistLinks.spotify}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="border border-zinc-700 px-2 py-1 text-zinc-200 hover:border-cyan-400 hover:text-cyan-300"
+                >
+                  Spotify artista
+                </a>
+                {preview.artistLinks.appleMusic ? (
+                  <a
+                    href={preview.artistLinks.appleMusic}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="border border-zinc-700 px-2 py-1 text-zinc-200 hover:border-cyan-400 hover:text-cyan-300"
+                  >
+                    Apple Music artista
+                  </a>
+                ) : null}
               </div>
             </div>
 
