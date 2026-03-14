@@ -40,6 +40,10 @@ make install-hooks
 
 Comandos completos: revisar [Makefile](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/Makefile).
 
+## CI
+
+El workflow [pre-commit.yml](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/.github/workflows/pre-commit.yml) ejecuta en GitHub Actions los mismos checks de `pre-commit` para `push` a `main` y `pull_request`.
+
 ## Estructura del proyecto
 
 ```txt
