@@ -2,6 +2,12 @@
 
 Aplicación Next.js para planificar tu ruta del festival, marcar favoritos y ver una previa rápida por artista.
 
+## Comportamiento del listado
+
+- Al abrir la app, el listado se posiciona automáticamente según la hora actual en `America/Santiago`.
+- Prioridad de foco: artista en vivo ahora -> próximo artista -> último artista del día.
+- Los shows que están ocurriendo en este momento se marcan con etiqueta `Ahora`.
+
 ## Stack
 
 - Next.js (App Router)
@@ -58,12 +64,18 @@ src/
 
 Reglas de orden: [docs/PROJECT_ORDER.md](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/docs/PROJECT_ORDER.md)
 
-## Datos de previews
+## Datos de previews y escucha
 
 Los previews de artistas son estáticos (sin IA runtime) y se cargan desde:
 
 - [artist-previews.ts](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/src/features/lineup/data/artist-previews.ts)
 - [docs/data-sources.md](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/docs/data-sources.md)
+
+Para rellenar/actualizar audio preview y links de escucha:
+
+```bash
+pnpm sync:listening-data
+```
 
 ## Contribuir
 
