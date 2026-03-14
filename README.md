@@ -67,5 +67,13 @@ Guía corta de contribución: [CONTRIBUTING.md](/Users/mfaundez/git/github/orden
 ## Deploy (Vercel)
 
 1. Importar el repo en Vercel.
-2. Framework preset: `Next.js`.
-3. Build command: `pnpm build` (o `make build`).
+2. Confirmar:
+   - Framework: `Next.js`
+   - Install Command: `pnpm install --frozen-lockfile`
+   - Build Command: `pnpm build`
+3. Runtime:
+   - Node.js: `24.x` (definido en `package.json`)
+   - pnpm: `10.x` (definido en `package.json`)
+4. Variables de entorno: no requiere para esta versión.
+
+Configuración explícita en [vercel.json](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/vercel.json).
