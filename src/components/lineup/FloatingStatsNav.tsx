@@ -14,7 +14,7 @@ export function FloatingStatsNav({
   onToggleView,
 }: FloatingStatsNavProps) {
   return (
-    <footer className="fixed bottom-0 left-0 right-0 px-4 py-3">
+    <footer className="fixed right-0 bottom-0 left-0 px-4 py-3">
       <div className="surface-main border-subtle mx-auto flex max-w-4xl items-center justify-between gap-4 border px-5 py-3">
         <div className="flex flex-col items-center">
           <span className="font-display text-[10px] text-zinc-400">EVENTOS</span>

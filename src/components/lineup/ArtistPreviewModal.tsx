@@ -115,10 +115,10 @@ export function ArtistPreviewModal({
           </>
         ) : null}
 
-        <header className="relative z-10 border-b border-zinc-800 px-5 pb-4 pt-5 sm:px-6 sm:pt-6">
+        <header className="relative z-10 border-b border-zinc-800 px-5 pt-5 pb-4 sm:px-6 sm:pt-6">
           <button
             onClick={onClose}
-            className="surface-muted border-subtle text-muted absolute right-4 top-4 border p-2 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 sm:right-6 sm:top-6"
+            className="surface-muted border-subtle text-muted absolute top-4 right-4 border p-2 transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none sm:top-6 sm:right-6"
             aria-label="Cerrar preview"
           >
             <X className="h-5 w-5" />
@@ -208,7 +208,7 @@ export function ArtistPreviewModal({
                             onClick={() => {
                               toggleSongPlayback(songId);
                             }}
-                            className={`mb-2 inline-flex min-h-10 w-full items-center justify-center gap-2 border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 ${
+                            className={`mb-2 inline-flex min-h-10 w-full items-center justify-center gap-2 border px-3 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none ${
                               isPlaying
                                 ? 'surface-raised border-cyan-400 text-cyan-300'
                                 : 'surface-main border-zinc-700 text-zinc-100 hover:border-cyan-400/70'
@@ -320,13 +320,13 @@ export function ArtistPreviewModal({
           </section>
         </div>
 
-        <footer className="relative z-10 border-t border-zinc-800 p-5 sm:px-6 sm:pb-6 sm:pt-5">
+        <footer className="relative z-10 border-t border-zinc-800 p-5 sm:px-6 sm:pt-5 sm:pb-6">
           <button
             onClick={() => {
               onToggleFavorite(artist.id);
               onClose();
             }}
-            className={`w-full border px-4 py-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60 ${
+            className={`w-full border px-4 py-3 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-cyan-400/60 focus-visible:outline-none ${
               isFavorite
                 ? 'surface-muted border-subtle text-zinc-300 hover:bg-zinc-800'
                 : 'button-cyan border-cyan-400 hover:bg-cyan-300'

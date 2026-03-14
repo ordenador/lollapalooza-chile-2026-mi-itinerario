@@ -74,7 +74,11 @@ test: ## Run tests
 	$(PNPM) run test
 
 .PHONY: update
-update: ## Update dependencies to latest versions (package.json + lockfile)
+update: ## Update dependencies within configured ranges (lockfile)
+	$(PNPM) update
+
+.PHONY: update-latest
+update-latest: ## Force update to latest major versions (package.json + lockfile)
 	$(PNPM) update --latest
 
 .PHONY: check
