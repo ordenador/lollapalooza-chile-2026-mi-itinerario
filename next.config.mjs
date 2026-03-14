@@ -14,6 +14,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**.dzcdn.net',
       },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      },
     ],
   },
 };

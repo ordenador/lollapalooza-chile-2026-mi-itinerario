@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Info } from 'lucide-react';
+import Image from 'next/image';
+import { Github, Info } from 'lucide-react';
 import { ArtistCard } from '@/components/lineup/ArtistCard';
 import { ArtistPreviewModal } from '@/components/lineup/ArtistPreviewModal';
 import { EmptyState } from '@/components/lineup/EmptyState';
@@ -25,6 +26,11 @@ import {
   getTimelineMinuteFromNow,
 } from '@/features/lineup/utils/timeFocus';
 import type { Artist, Stage, ViewMode } from '@/features/lineup/types';
+
+const GITHUB_REPOSITORY_URL =
+  'https://github.com/ordenador/lollapalooza-chile-2026-mi-itinerario';
+const AUTHOR_PROFILE_URL = 'https://ordenador.cl/';
+const AUTHOR_AVATAR_URL = 'https://avatars.githubusercontent.com/u/2941875';
 
 export default function Page() {
   const { favorites, favoritesSet, isFavorite, toggleFavorite } = useFavorites();
@@ -142,6 +148,36 @@ export default function Page() {
           </div>
         )}
       </main>
+
+      <footer className="mx-auto mt-4 w-full max-w-4xl px-4 pb-32">
+        <div className="surface-main border-subtle flex flex-wrap items-center justify-between gap-3 border px-3 py-2 text-sm text-zinc-300">
+          <a
+            href={AUTHOR_PROFILE_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-3 transition-colors hover:text-white"
+          >
+            <Image
+              src={AUTHOR_AVATAR_URL}
+              alt="Avatar de ordenador"
+              width={32}
+              height={32}
+              className="rounded-full border border-zinc-700 object-cover"
+            />
+            <span>Autor: ordenador.cl</span>
+          </a>
+
+          <a
+            href={GITHUB_REPOSITORY_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 border-b border-zinc-600 pb-0.5 transition-colors hover:border-zinc-300 hover:text-white"
+          >
+            <Github className="h-4 w-4" />
+            <span>Ver en GitHub</span>
+          </a>
+        </div>
+      </footer>
 
       <ArtistPreviewModal
         artist={selectedArtist}
