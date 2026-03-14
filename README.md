@@ -2,6 +2,8 @@
 
 Aplicación Next.js para planificar tu ruta del festival, marcar favoritos y ver una previa rápida por artista.
 
+Web publicada: [https://lollapalooza-chile-2026-mi-itinerar.vercel.app/](https://lollapalooza-chile-2026-mi-itinerar.vercel.app/)
+
 ## Comportamiento del listado
 
 - Al abrir la app, el listado se posiciona automáticamente según la hora actual en `America/Santiago`.
