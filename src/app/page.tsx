@@ -132,6 +132,7 @@ export default function Page() {
               <ArtistCard
                 key={artist.id}
                 artist={artist}
+                artistImageUrl={ARTIST_PREVIEWS[artist.id]?.artistImageUrl ?? null}
                 isFavorite={favoritesSet.has(artist.id)}
                 isLiveNow={lineupFocus.liveArtistIds.includes(artist.id)}
                 onToggleFavorite={toggleFavorite}

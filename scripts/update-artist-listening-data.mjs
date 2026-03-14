@@ -233,7 +233,42 @@ function dedupeSongs(results) {
   return unique;
 }
 
+function isFallbackSongTitle(songTitle) {
+  return normalizeText(songTitle).startsWith('track recomendado');
+}
+
+function isMeaningfulTitle(songTitle) {
+  return Boolean(songTitle && !isFallbackSongTitle(songTitle));
+}
+
+function uniqueStrings(values) {
+  return [...new Set(values.filter(Boolean))];
+}
+
+function buildDeezerArtistQueries(artistName) {
+  const queries = [`artist:\"${artistName}\"`, artistName];
+  const normalizedTokens = normalizeText(artistName)
+    .split(' ')
+    .filter((token) => token.length > 2);
+  const uniqueTokens = [...new Set(normalizedTokens)];
+
+  if (uniqueTokens.length === 1) {
+    queries.push(uniqueTokens[0]);
+  }
+
+  return uniqueStrings(queries);
+}
+
 async function resolveTopSongTitles(artistName) {
+  const iTunesTitles = await resolveTopSongTitlesFromItunes(artistName);
+  if (iTunesTitles.length >= 3) {
+    return iTunesTitles.slice(0, 3);
+  }
+  const deezerTitles = await resolveTopSongTitlesFromDeezer(artistName);
+  return uniqueStrings([...iTunesTitles, ...deezerTitles]).slice(0, 3);
+}
+
+async function resolveTopSongTitlesFromItunes(artistName) {
   const url = `https://itunes.apple.com/search?term=${encodeURIComponent(artistName)}&entity=song&country=CL&limit=50`;
   const payload = await fetchJson(url);
   const results = Array.isArray(payload?.results) ? payload.results : [];
@@ -254,16 +289,117 @@ async function resolveTopSongTitles(artistName) {
   return uniqueSongs.slice(0, 3);
 }
 
+async function resolveTopSongTitlesFromDeezer(artistName) {
+  const rankedTracks = [];
+  const queries = buildDeezerArtistQueries(artistName);
+
+  for (const query of queries) {
+    const url = `https://api.deezer.com/search?q=${encodeURIComponent(query)}`;
+    const payload = await fetchJson(url);
+    const results = Array.isArray(payload?.data) ? payload.data : [];
+
+    rankedTracks.push(
+      ...results
+        .map((result) => ({
+          result,
+          score: artistMatchScore(artistName, String(result?.artist?.name ?? '')),
+        }))
+        .filter(({ result, score }) => score >= 25 && typeof result?.title === 'string')
+        .sort((a, b) => b.score - a.score)
+        .map(({ result }) => ({ trackName: result.title })),
+    );
+  }
+
+  return dedupeSongs(rankedTracks).slice(0, 3);
+}
+
+function pickBestDeezerTrackResult(results, artistName, songTitle) {
+  const isFallbackTitle = isFallbackSongTitle(songTitle);
+  const normalizedSongTitle = normalizeText(songTitle);
+  const songTokens = normalizedSongTitle
+    .split(' ')
+    .filter((token) => token.length > 2)
+    .slice(0, 8);
+
+  let bestResult = null;
+  let bestScore = -1;
+
+  for (const result of results) {
+    const title = String(result?.title ?? '').trim();
+    const artist = String(result?.artist?.name ?? '').trim();
+    if (!title || !artist) {
+      continue;
+    }
+
+    const normalizedTrackName = normalizeText(title);
+    let score = artistMatchScore(artistName, artist);
+
+    if (!isFallbackTitle && normalizedTrackName === normalizedSongTitle) {
+      score += 70;
+    }
+
+    if (!isFallbackTitle && normalizedTrackName.includes(normalizedSongTitle)) {
+      score += 35;
+    }
+
+    if (!isFallbackTitle) {
+      for (const token of songTokens) {
+        if (normalizedTrackName.includes(token)) {
+          score += 6;
+        }
+      }
+    }
+
+    if (result?.preview) {
+      score += 8;
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestResult = result;
+    }
+  }
+
+  if (bestScore < (isFallbackTitle ? 30 : 40)) {
+    return null;
+  }
+
+  return bestResult;
+}
+
+async function resolveSongFromDeezer(artistName, songTitle) {
+  const queries = isFallbackSongTitle(songTitle)
+    ? buildDeezerArtistQueries(artistName)
+    : uniqueStrings([`${artistName} ${songTitle}`, `artist:\"${artistName}\" ${songTitle}`]);
+  const results = [];
+
+  for (const query of queries) {
+    const url = `https://api.deezer.com/search?q=${encodeURIComponent(query)}`;
+    const payload = await fetchJson(url);
+    const queryResults = Array.isArray(payload?.data) ? payload.data : [];
+    results.push(...queryResults);
+  }
+
+  const bestResult = pickBestDeezerTrackResult(results, artistName, songTitle);
+
+  return {
+    previewUrl: bestResult?.preview ?? null,
+  };
+}
+
 async function resolveSong(artistName, songTitle) {
   const query = `${artistName} ${songTitle}`;
   const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&country=CL&limit=25`;
   const payload = await fetchJson(url);
   const results = Array.isArray(payload?.results) ? payload.results : [];
   const bestResult = pickBestSongResult(results, artistName, songTitle);
+  const deezerResult = bestResult?.previewUrl
+    ? null
+    : await resolveSongFromDeezer(artistName, songTitle);
 
   return {
     title: songTitle,
-    previewUrl: bestResult?.previewUrl ?? null,
+    previewUrl: bestResult?.previewUrl ?? deezerResult?.previewUrl ?? null,
     links: {
       appleMusic: bestResult?.trackViewUrl ?? null,
       spotify: buildSpotifySearchUrl(`${artistName} ${songTitle}`),
@@ -282,6 +418,25 @@ async function resolveArtistAppleMusicLink(artistName) {
 }
 
 async function resolveArtistImageUrl(artistName) {
+  const iTunesImage = await resolveArtistImageUrlFromItunes(artistName);
+  if (iTunesImage) {
+    return iTunesImage;
+  }
+
+  const audioDbImage = await resolveArtistImageUrlFromAudioDb(artistName);
+  if (audioDbImage) {
+    return audioDbImage;
+  }
+
+  const deezerImage = await resolveArtistImageUrlFromDeezer(artistName);
+  if (deezerImage) {
+    return deezerImage;
+  }
+
+  return null;
+}
+
+async function resolveArtistImageUrlFromItunes(artistName) {
   const url = `https://itunes.apple.com/search?term=${encodeURIComponent(artistName)}&entity=song&country=CL&limit=30`;
   const payload = await fetchJson(url);
   const results = Array.isArray(payload?.results) ? payload.results : [];
@@ -291,13 +446,62 @@ async function resolveArtistImageUrl(artistName) {
       result,
       score: artistMatchScore(artistName, String(result?.artistName ?? '')),
     }))
-    .filter(({ result, score }) => score >= 10 && result?.artworkUrl100)
+    .filter(({ result, score }) => score >= 30 && result?.artworkUrl100)
     .sort((a, b) => b.score - a.score)[0]?.result;
 
-  const fallbackMatch = results.find((result) => result?.artworkUrl100) ?? null;
-  const artworkUrl = bestMatch?.artworkUrl100 ?? fallbackMatch?.artworkUrl100 ?? null;
+  const exactMatch =
+    results.find(
+      (result) =>
+        result?.artworkUrl100 &&
+        normalizeText(String(result?.artistName ?? '')) === normalizeText(artistName),
+    ) ?? null;
+  const artworkUrl = bestMatch?.artworkUrl100 ?? exactMatch?.artworkUrl100 ?? null;
 
   return upscaleArtworkUrl(artworkUrl, 600);
+}
+
+async function resolveArtistImageUrlFromAudioDb(artistName) {
+  const url = `https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(artistName)}`;
+  const payload = await fetchJson(url);
+  const results = Array.isArray(payload?.artists) ? payload.artists : [];
+
+  const bestMatch = results
+    .map((result) => ({
+      result,
+      score: artistMatchScore(artistName, String(result?.strArtist ?? '')),
+    }))
+    .filter(
+      ({ result, score }) => score >= 30 && (result?.strArtistThumb || result?.strArtistFanart),
+    )
+    .sort((a, b) => b.score - a.score)[0]?.result;
+
+  return bestMatch?.strArtistThumb ?? bestMatch?.strArtistFanart ?? null;
+}
+
+async function resolveArtistImageUrlFromDeezer(artistName) {
+  const url = `https://api.deezer.com/search/artist?q=${encodeURIComponent(artistName)}`;
+  const payload = await fetchJson(url);
+  const results = Array.isArray(payload?.data) ? payload.data : [];
+
+  const bestMatch = results
+    .map((result) => ({
+      result,
+      score: artistMatchScore(artistName, String(result?.name ?? '')),
+    }))
+    .filter(
+      ({ result, score }) =>
+        score >= 30 &&
+        (result?.picture_xl || result?.picture_big || result?.picture_medium || result?.picture),
+    )
+    .sort((a, b) => b.score - a.score)[0]?.result;
+
+  return (
+    bestMatch?.picture_xl ??
+    bestMatch?.picture_big ??
+    bestMatch?.picture_medium ??
+    bestMatch?.picture ??
+    null
+  );
 }
 
 function buildStyleDescription(artistName, genre) {
@@ -326,7 +530,8 @@ async function main() {
   for (const artist of artists) {
     const topTitles = await resolveTopSongTitles(artist.name);
     const baselineTitles = baselineSongs[artist.id] ?? [];
-    const chosenTitles = baselineTitles.length > 0 ? baselineTitles : topTitles;
+    const baselineHasMeaningfulTitles = baselineTitles.some(isMeaningfulTitle);
+    const chosenTitles = baselineHasMeaningfulTitles ? baselineTitles : topTitles;
 
     const songTitles = [...chosenTitles];
     while (songTitles.length < 3) {

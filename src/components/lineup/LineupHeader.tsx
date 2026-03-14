@@ -30,11 +30,11 @@ export function LineupHeader({
 
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search className="text-muted absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+            <Search className="text-muted absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Buscar banda..."
-              className="surface-muted border-subtle w-full border py-2 pr-4 pl-10 text-sm text-white transition-colors outline-none focus:border-cyan-400"
+              className="surface-muted border-subtle w-full border py-2 pl-10 pr-4 text-sm text-white outline-none transition-colors focus:border-cyan-400"
               value={searchTerm}
               onChange={(event) => onSearchTermChange(event.target.value)}
               aria-label="Buscar banda"

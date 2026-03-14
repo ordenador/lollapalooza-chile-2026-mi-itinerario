@@ -6,6 +6,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**.mzstatic.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'r2.theaudiodb.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.dzcdn.net',
+      },
     ],
   },
 };

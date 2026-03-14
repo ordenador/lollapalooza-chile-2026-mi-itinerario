@@ -18,7 +18,7 @@ export function StageFilters({
           <button
             key={stage}
             onClick={() => onSelectStage(stage)}
-            className={`font-display border px-3 py-1.5 text-xs whitespace-nowrap transition-colors ${
+            className={`font-display whitespace-nowrap border px-3 py-1.5 text-xs transition-colors ${
               selectedStage === stage
                 ? 'button-lime border-lime-300'
                 : 'surface-muted border-subtle text-zinc-200 hover:bg-zinc-800'
