@@ -33,6 +33,7 @@ App local: [http://localhost:3000](http://localhost:3000)
 make help
 make dev
 make build
+make update
 make check
 make install-hooks
 ```

@@ -31,9 +31,6 @@ install-dependencies: ## Install dependencies
 		$(PNPM) install; \
 	fi
 
-.PHONY: install
-install: install-dependencies ## Alias for install-dependencies
-
 .PHONY: dev
 dev: ## Start development server (auto-installs pre-commit hooks)
 	@echo "$(GREEN)Checking pre-commit installation...$(NC)"
@@ -68,9 +65,6 @@ lint: ## Run ESLint
 format: ## Format codebase with Prettier
 	$(PNPM) run format
 
-.PHONY: fix
-fix: format ## Alias for format
-
 .PHONY: type-check
 type-check: ## Run TypeScript checks
 	$(PNPM) run type-check
@@ -78,6 +72,10 @@ type-check: ## Run TypeScript checks
 .PHONY: test
 test: ## Run tests
 	$(PNPM) run test
+
+.PHONY: update
+update: ## Update dependencies to latest versions (package.json + lockfile)
+	$(PNPM) update --latest
 
 .PHONY: check
 check: ## Run format check + lint + type-check + test
