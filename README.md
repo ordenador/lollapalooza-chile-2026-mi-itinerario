@@ -1,31 +1,15 @@
 # Lollapalooza Chile 2026 - Mi Itinerario
 
-Aplicación Next.js para planificar tu ruta del festival, marcar favoritos y ver una previa rápida por artista.
+App web para planificar la ruta del festival, marcar favoritos y escuchar previews de artistas.
 
-Web publicada: [https://lollapalooza-chile-2026-mi-itinerar.vercel.app/](https://lollapalooza-chile-2026-mi-itinerar.vercel.app/)
-
-## Comportamiento del listado
-
-- Al abrir la app, el listado se posiciona automáticamente según la hora actual en `America/Santiago`.
-- Prioridad de foco: artista en vivo ahora -> próximo artista -> último artista del día.
-- Los shows que están ocurriendo en este momento se marcan con etiqueta `Ahora`.
-
-## Stack
-
-- Next.js (App Router)
-- TypeScript
-- Tailwind CSS
-- pnpm + Makefile
-- Vitest + Testing Library
-- pre-commit
+Demo: [https://lollapalooza-chile-2026-mi-itinerar.vercel.app/](https://lollapalooza-chile-2026-mi-itinerar.vercel.app/)
 
 ## Requisitos
 
-- Node.js 24.x (`.nvmrc`)
-- pnpm
-- pre-commit (recomendado: `pipx install pre-commit`)
+- Node.js `24.x`
+- pnpm `10.x`
 
-## Inicio rápido
+## Uso local
 
 ```bash
 corepack enable
@@ -33,66 +17,29 @@ make install-dependencies
 make dev
 ```
 
-App local: [http://localhost:3000](http://localhost:3000)
+Abrir: `http://localhost:3000`
 
-## Comandos principales
+## Comandos útiles
 
 ```bash
-make help
 make dev
 make build
-make update
 make check
-make install-hooks
-```
-
-Comandos completos: revisar [Makefile](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/Makefile).
-
-## CI
-
-El workflow [ci.yml](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/.github/workflows/ci.yml) ejecuta `make check` en `push` a `main` y `pull_request`. `pre-commit` se mantiene para feedback local antes de commitear.
-
-## Estructura del proyecto
-
-```txt
-src/
-  app/            # rutas y layouts
-  features/       # lógica de dominio (lineup)
-  components/     # UI reutilizable
-  lib/            # utilidades transversales
-  styles/         # estilos globales
-  tests/          # pruebas unitarias/smoke
-```
-
-Reglas de orden: [docs/PROJECT_ORDER.md](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/docs/PROJECT_ORDER.md)
-
-## Datos de previews y escucha
-
-Los previews de artistas son estáticos (sin IA runtime) y se cargan desde:
-
-- [artist-previews.ts](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/src/features/lineup/data/artist-previews.ts)
-- [docs/data-sources.md](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/docs/data-sources.md)
-
-Para rellenar/actualizar audio preview y links de escucha:
-
-```bash
+make update
 pnpm sync:listening-data
 ```
 
-## Contribuir
+## Estructura
 
-Guía corta de contribución: [CONTRIBUTING.md](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/CONTRIBUTING.md)
+```txt
+src/app          rutas y layout
+src/components   UI
+src/features     dominio lineup
+src/tests        pruebas
+```
 
-## Deploy (Vercel)
+## Notas
 
-1. Importar el repo en Vercel.
-2. Confirmar:
-   - Framework: `Next.js`
-   - Install Command: `pnpm install --frozen-lockfile`
-   - Build Command: `pnpm build`
-3. Runtime:
-   - Node.js: `24.x` (definido en `package.json`)
-   - pnpm: `10.x` (definido en `package.json`)
-4. Variables de entorno: no requiere para esta versión.
-
-Configuración explícita en [vercel.json](/Users/mfaundez/git/github/ordenador/lollapalooza-chile-2026-mi-itinerario/vercel.json).
+- No requiere variables de entorno para correr.
+- Datos de escucha/previews: `src/features/lineup/data/artist-previews.ts`
+- Fuentes de datos: `docs/data-sources.md`
