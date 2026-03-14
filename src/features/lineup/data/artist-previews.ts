@@ -1533,55 +1533,49 @@ export const ARTIST_PREVIEWS: Record<number, ArtistPreview> = {
   31: {
     songs: [
       {
-        title: 'School of Rock',
-        previewUrl:
-          'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/64/06/d3/6406d387-4461-adc6-8690-c62ffe04dad4/mzaf_18120629186495848421.plus.aac.p.m4a',
+        title: 'Covers de rock en vivo',
+        previewUrl: null,
         links: {
-          appleMusic:
-            'https://music.apple.com/cl/album/school-of-rock/1749374297?i=1749374432&uo=4',
+          appleMusic: null,
           spotify:
-            'https://open.spotify.com/search/School%20of%20Rock%20School%20of%20Rock',
+            'https://open.spotify.com/search/School%20of%20Rock%20Santiago%20en%20vivo',
           youtube:
-            'https://www.youtube.com/results?search_query=School%20of%20Rock%20School%20of%20Rock',
+            'https://www.youtube.com/results?search_query=School+of+Rock+Santiago+en+vivo',
         },
       },
       {
-        title: 'Stick It to the Man',
-        previewUrl:
-          'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/a0/7a/c3/a07ac379-bdd4-a01c-791b-cd40adedb9af/mzaf_11558569441603492088.plus.aac.p.m4a',
+        title: 'Ensamble infantil',
+        previewUrl: null,
         links: {
-          appleMusic:
-            'https://music.apple.com/cl/album/stick-it-to-the-man/1056441943?i=1056442619&uo=4',
+          appleMusic: null,
           spotify:
-            'https://open.spotify.com/search/School%20of%20Rock%20Stick%20It%20to%20the%20Man',
+            'https://open.spotify.com/search/School%20of%20Rock%20Santiago%20kidzapalooza',
           youtube:
-            'https://www.youtube.com/results?search_query=School%20of%20Rock%20Stick%20It%20to%20the%20Man',
+            'https://www.youtube.com/results?search_query=School+of+Rock+Santiago+kidzapalooza',
         },
       },
       {
-        title: 'Finale',
-        previewUrl:
-          'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/3b/a2/92/3ba29287-4dfc-80e2-939a-eac4f1e52e58/mzaf_3249206590151468382.plus.aac.p.m4a',
+        title: 'Presentacion para ninos',
+        previewUrl: null,
         links: {
-          appleMusic:
-            'https://music.apple.com/cl/album/finale/1056441943?i=1056442626&uo=4',
-          spotify: 'https://open.spotify.com/search/School%20of%20Rock%20Finale',
+          appleMusic: null,
+          spotify:
+            'https://open.spotify.com/search/School%20of%20Rock%20Santiago%20ninos',
           youtube:
-            'https://www.youtube.com/results?search_query=School%20of%20Rock%20Finale',
+            'https://www.youtube.com/results?search_query=School+of+Rock+Santiago+ninos',
         },
       },
     ],
-    artistImageUrl:
-      'https://r2.theaudiodb.com/images/media/artist/thumb/swuyrq1432757155.jpg',
+    artistImageUrl: null,
     artistLinks: {
-      appleMusic: 'https://music.apple.com/cl/artist/school-of-rock/1506507844?uo=4',
-      spotify: 'https://open.spotify.com/search/School%20of%20Rock',
-      youtube: 'https://www.youtube.com/results?search_query=School%20of%20Rock',
+      appleMusic: null,
+      spotify: 'https://open.spotify.com/search/School%20of%20Rock%20Santiago',
+      youtube: 'https://www.youtube.com/results?search_query=School+of+Rock+Santiago',
     },
     styleDescription:
-      'School of Rock es un musical basado en la película homónima de 2003, con libreto de Julian Fellowes, música de Andrew Lloyd Webber y letras de Glenn Slater. Para esta guía, lo ubicamos en rock. Fuente: Wikipedia ES.',
+      'School of Rock Santiago es un proyecto formativo de musica para ninos y jovenes que presenta ensambles en vivo. Para esta guia, lo ubicamos en rock infantil / formativo dentro de Kidzapalooza.',
     verdict:
-      'Si te interesa rock y te calza el perfil real de School of Rock, este show es una buena opción para priorizar en la jornada.',
+      'Si vas con ninos o buscas una experiencia familiar, School of Rock Santiago puede ser una gran opcion para priorizar en Kidzapalooza.',
   },
   32: {
     songs: [
@@ -1622,16 +1616,17 @@ export const ARTIST_PREVIEWS: Record<number, ArtistPreview> = {
         },
       },
     ],
-    artistImageUrl: null,
+    artistImageUrl:
+      'https://is1-ssl.mzstatic.com/image/thumb/Music/5e/9a/cc/mzi.mhxjkjoc.jpg/600x600bb.jpg',
     artistLinks: {
       appleMusic: 'https://music.apple.com/cl/artist/wassa/151398060?uo=4',
       spotify: 'https://open.spotify.com/search/Wassa%20Wassa',
       youtube: 'https://www.youtube.com/results?search_query=Wassa%20Wassa',
     },
     styleDescription:
-      'Wassa Wassa aparece en MusicBrainz como banda. Para esta guía, lo ubicamos en música africana. Fuente: MusicBrainz.',
+      'Wassa Wassa es una propuesta de percusion y musica de raiz africana, orientada a una experiencia familiar en Kidzapalooza. Para esta guia, lo ubicamos en musica africana / familiar.',
     verdict:
-      'Si te interesa música africana y te calza el perfil real de Wassa Wassa, este show es una buena opción para priorizar en la jornada.',
+      'Si vas con ninos o buscas un show familiar y ritmico, Wassa Wassa es una muy buena opcion para priorizar en Kidzapalooza.',
   },
   33: {
     songs: [

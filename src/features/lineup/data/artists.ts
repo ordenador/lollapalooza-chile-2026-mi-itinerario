@@ -256,11 +256,11 @@ export const ARTISTS_DATA: readonly Artist[] = [
   },
   {
     id: 31,
-    name: 'School of Rock',
+    name: 'School of Rock Santiago',
     start: '15:30',
     end: '16:15',
     stage: 'Kidzapalooza Stage',
-    genre: 'Rock',
+    genre: 'Rock infantil / formativo',
   },
   {
     id: 32,
@@ -268,7 +268,7 @@ export const ARTISTS_DATA: readonly Artist[] = [
     start: '17:00',
     end: '17:45',
     stage: 'Kidzapalooza Stage',
-    genre: 'Música africana',
+    genre: 'Música africana / familiar',
   },
   {
     id: 33,
